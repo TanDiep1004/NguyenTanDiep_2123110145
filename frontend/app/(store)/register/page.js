@@ -76,7 +76,7 @@ export default function CustomerRegisterPage() {
     } finally {
       setLoading(false);
       alert(`Đăng ký tài khoản NTD Eyewear (${formattedEmail}) thành công! Tự động đăng nhập.`);
-      router.push('/');
+      window.location.href = '/';
     }
   };
 
