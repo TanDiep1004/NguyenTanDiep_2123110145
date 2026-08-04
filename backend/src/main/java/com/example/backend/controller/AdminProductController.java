@@ -178,24 +178,43 @@ public class AdminProductController {
             throw new RuntimeException("Không tìm thấy sản phẩm với ID: " + id);
         }
 
-        // 1. Xóa các bảng liên kết Foreign Key trước khi xóa sản phẩm
         try {
-            jdbcTemplate.update("DELETE FROM promotion_products WHERE product_id = ?", id);
-            jdbcTemplate.update("DELETE FROM cart_items WHERE product_id = ?", id);
-            jdbcTemplate.update("DELETE FROM reviews WHERE product_id = ?", id);
+            // Kiểm tra trước xem có dính dáng đến order_details không (chặn lỗi SQL Constraint)
+            Integer orderCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM order_details od JOIN product_variants pv ON od.variant_id = pv.id WHERE pv.product_id = ?",
+                Integer.class, id
+            );
+            
+            if (orderCount != null && orderCount > 0) {
+                return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa! Sản phẩm này đã phát sinh đơn hàng trong hệ thống. Để bảo toàn dữ liệu, vui lòng chuyển trạng thái sang 'Ẩn tạm thời'."));
+            }
+
+            // 1. Xóa các bảng liên kết Foreign Key trước khi xóa sản phẩm
+            try {
+                jdbcTemplate.update("DELETE FROM promotion_products WHERE product_id = ?", id);
+                jdbcTemplate.update("DELETE FROM cart_items WHERE product_id = ?", id);
+                jdbcTemplate.update("DELETE FROM reviews WHERE product_id = ?", id);
+            } catch (Exception e) {
+                System.err.println("Lỗi khi xóa bảng phụ thuộc: " + e.getMessage());
+            }
+
+            // 2. Xóa các biến thể và hình ảnh
+            List<ProductVariant> variants = productVariantRepository.findByProductId(id);
+            productVariantRepository.deleteAll(variants);
+            productVariantRepository.flush();
+
+            List<ProductImage> images = productImageRepository.findByProductId(id);
+            productImageRepository.deleteAll(images);
+            productImageRepository.flush();
+
+            // 3. Xóa sản phẩm
+            productRepository.deleteById(id);
+            productRepository.flush();
+            return ResponseEntity.ok(ApiResponse.success(null, "Xóa sản phẩm thành công!"));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa! Sản phẩm này đã phát sinh đơn hàng trong hệ thống. Để bảo toàn dữ liệu, vui lòng chuyển trạng thái sang 'Ẩn tạm thời'."));
         } catch (Exception e) {
-            System.err.println("Lỗi khi xóa bảng phụ thuộc: " + e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Lỗi hệ thống khi xóa sản phẩm: " + e.getMessage()));
         }
-
-        // 2. Xóa các biến thể và hình ảnh
-        List<ProductVariant> variants = productVariantRepository.findByProductId(id);
-        productVariantRepository.deleteAll(variants);
-
-        List<ProductImage> images = productImageRepository.findByProductId(id);
-        productImageRepository.deleteAll(images);
-
-        // 3. Xóa sản phẩm
-        productRepository.deleteById(id);
-        return ResponseEntity.ok(ApiResponse.success(null, "Xóa sản phẩm thành công!"));
     }
 }

@@ -18,7 +18,7 @@ public class PublicBrandController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Brand>>> getAllBrands() {
-        List<Brand> brands = brandRepository.findAll();
+        List<Brand> brands = brandRepository.findByStatus(1);
         return ResponseEntity.ok(ApiResponse.success(brands, "Lấy danh sách thương hiệu thành công!"));
     }
 }

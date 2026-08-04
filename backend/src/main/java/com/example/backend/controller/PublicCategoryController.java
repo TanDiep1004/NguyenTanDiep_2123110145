@@ -18,7 +18,7 @@ public class PublicCategoryController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findByStatus(1);
         return ResponseEntity.ok(ApiResponse.success(categories, "Lấy danh sách danh mục thành công!"));
     }
 }

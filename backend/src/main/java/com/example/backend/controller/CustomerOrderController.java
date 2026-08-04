@@ -43,4 +43,45 @@ public class CustomerOrderController {
         List<Order> orders = orderRepository.findByUserId(userDetails.getUser().getId());
         return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách đơn hàng thành công!"));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Order>> getOrderById(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null || userDetails.getUser() == null) {
+            throw new RuntimeException("Bạn cần đăng nhập để xem đơn hàng!");
+        }
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng!"));
+                
+        if (!order.getUser().getId().equals(userDetails.getUser().getId())) {
+            throw new RuntimeException("Bạn không có quyền xem đơn hàng này!");
+        }
+        
+        return ResponseEntity.ok(ApiResponse.success(order, "Lấy chi tiết đơn hàng thành công!"));
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<Order>> cancelOrder(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null || userDetails.getUser() == null) {
+            throw new RuntimeException("Bạn cần đăng nhập để thao tác!");
+        }
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng!"));
+                
+        if (!order.getUser().getId().equals(userDetails.getUser().getId())) {
+            throw new RuntimeException("Bạn không có quyền hủy đơn hàng này!");
+        }
+        
+        if (!"Pending".equalsIgnoreCase(order.getStatus())) {
+            throw new RuntimeException("Chỉ có thể hủy đơn hàng khi ở trạng thái Chờ xác nhận!");
+        }
+        
+        order.setStatus("Cancelled");
+        orderRepository.save(order);
+        
+        return ResponseEntity.ok(ApiResponse.success(order, "Đã hủy đơn hàng thành công!"));
+    }
 }

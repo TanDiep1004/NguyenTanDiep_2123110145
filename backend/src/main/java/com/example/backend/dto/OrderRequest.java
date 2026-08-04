@@ -10,9 +10,7 @@ import java.util.List;
 @Builder
 public class OrderRequest {
     private Integer userId;
-    private String receiverName;
-    private String receiverPhone;
-    private String shippingAddress;
+    private Integer addressId;
     private String paymentMethod;
     private String promotionCode;
     private List<OrderItemRequest> items;

@@ -25,6 +25,7 @@ public class AdminCategoryController {
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
@@ -73,20 +74,36 @@ public class AdminCategoryController {
         }
 
         try {
+            // Kiểm tra trước xem danh mục này có chứa sản phẩm nào đã phát sinh đơn hàng không
+            Integer orderCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM order_details od JOIN product_variants pv ON od.variant_id = pv.id JOIN products p ON pv.product_id = p.id WHERE p.category_id = ?",
+                Integer.class, id
+            );
+            
+            if (orderCount != null && orderCount > 0) {
+                return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa Danh mục này vì có Sản phẩm bên trong đã phát sinh Đơn hàng. Vui lòng chuyển trạng thái sang 'Ẩn' để bảo toàn dữ liệu."));
+            }
+
             // Tự động giải phóng các sản phẩm thuộc danh mục này trước khi xóa
             List<Product> products = productRepository.findByCategoryId(id);
             for (Product p : products) {
                 List<ProductVariant> variants = productVariantRepository.findByProductId(p.getId());
                 productVariantRepository.deleteAll(variants);
+                productVariantRepository.flush();
 
                 List<ProductImage> images = productImageRepository.findByProductId(p.getId());
                 productImageRepository.deleteAll(images);
+                productImageRepository.flush();
 
                 productRepository.delete(p);
+                productRepository.flush();
             }
 
             categoryRepository.deleteById(id);
+            categoryRepository.flush();
             return ResponseEntity.ok(ApiResponse.success("Xóa", "Xóa Danh mục thành công!"));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa Danh mục này vì có Sản phẩm bên trong đã phát sinh Đơn hàng. Vui lòng chuyển trạng thái sang 'Ẩn' để bảo toàn dữ liệu."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa danh mục: " + e.getMessage()));
         }

@@ -14,6 +14,18 @@ export const orderService = {
     });
   },
 
+  getOrderById: async (id) => {
+    return await fetchApi(`/user/orders/${id}`, {
+      method: 'GET',
+    });
+  },
+
+  cancelOrder: async (id) => {
+    return await fetchApi(`/user/orders/${id}/cancel`, {
+      method: 'PUT',
+    });
+  },
+
   getAllOrdersAdmin: async () => {
     return await fetchApi('/admin/orders', {
       method: 'GET',

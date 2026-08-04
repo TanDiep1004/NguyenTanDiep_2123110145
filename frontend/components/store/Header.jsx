@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Glasses, Search, ShoppingBag, User, Phone, ChevronDown, Shield, Tag, UserPlus, LogOut, Package } from 'lucide-react';
+import { Glasses, Search, ShoppingBag, User, Phone, ChevronDown, Shield, Tag, UserPlus, LogOut, Package, ClipboardList } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { fetchApi } from '@/lib/api';
 import { getUser, getToken, isAdmin, logout } from '@/lib/auth';
@@ -190,6 +190,11 @@ export default function Header() {
                     <span>Buồng lái Admin</span>
                   </Link>
                 )}
+
+                <Link href="/orders" className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:bg-slate-800">
+                  <ClipboardList className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Lịch sử đơn hàng</span>
+                </Link>
 
                 <Link href="/cart" onClick={handleCartClick} className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:bg-slate-800">
                   <Package className="w-3.5 h-3.5 text-emerald-400" />

@@ -3,9 +3,11 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -27,14 +29,9 @@ public class Order {
     @JoinColumn(name = "promotion_id")
     private Promotion promotion;
 
-    @Column(name = "receiver_name", nullable = false, length = 100)
-    private String receiverName;
-
-    @Column(name = "receiver_phone", nullable = false, length = 20)
-    private String receiverPhone;
-
-    @Column(name = "shipping_address", columnDefinition = "TEXT", nullable = false)
-    private String shippingAddress;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private UserAddress address;
 
     @Column(name = "payment_method", nullable = false, length = 50)
     private String paymentMethod;
@@ -56,4 +53,8 @@ public class Order {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<OrderDetail> orderDetails;
 }

@@ -24,12 +24,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const menuGroups = [
-    {
-      title: 'WEBSITE',
-      items: [
-        { name: 'Landing Page', href: '/', icon: Globe }
-      ]
-    },
+
     {
       title: 'DASHBOARDS',
       items: [

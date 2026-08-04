@@ -27,8 +27,8 @@ export default function AdminLayout({ children }) {
 
       // Check strictly if role is admin or staff
       if (!isAdmin()) {
-        alert('CẢNH BÁO PHÂN QUYỀN:\nTài khoản của bạn là KHÁCH HÀNG, không có quyền truy cập Buồng Lái Admin!\nChệch hướng về trang mua sắm.');
-        router.push('/');
+        alert('YÊU CẦU ĐĂNG NHẬP ADMIN:\nTài khoản hiện tại của bạn không có quyền truy cập. Vui lòng đăng nhập bằng tài khoản Quản trị viên!');
+        router.push('/admin/login');
         return;
       }
     }

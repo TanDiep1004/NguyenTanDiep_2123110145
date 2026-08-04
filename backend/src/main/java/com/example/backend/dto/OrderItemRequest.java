@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class OrderItemRequest {
+    private Integer productId;
     private Integer variantId;
     private Integer quantity;
 }

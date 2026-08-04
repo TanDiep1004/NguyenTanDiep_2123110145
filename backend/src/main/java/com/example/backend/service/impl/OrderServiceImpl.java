@@ -28,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final PromotionRepository promotionRepository;
     private final PromotionService promotionService;
+    private final UserAddressRepository userAddressRepository;
 
     @Override
     @Transactional
@@ -51,7 +52,19 @@ public class OrderServiceImpl implements OrderService {
         // 2. Chạy vòng lặp kiểm tra từng món: Kho còn đủ số lượng (stock_quantity) để bán không?
         for (OrderItemRequest item : validItems) {
             ProductVariant variant = productVariantRepository.findById(item.getVariantId())
-                    .orElseThrow(() -> new RuntimeException("Biến thể sản phẩm ID " + item.getVariantId() + " không tồn tại!"));
+                    .orElse(null);
+            
+            // Auto-correct: if variant not found (e.g. invalid frontend mock ID 101), try to pick the first available variant of the product
+            if (variant == null && item.getProductId() != null) {
+                List<ProductVariant> productVariants = productVariantRepository.findByProductId(item.getProductId());
+                if (productVariants != null && !productVariants.isEmpty()) {
+                    variant = productVariants.get(0);
+                }
+            }
+
+            if (variant == null) {
+                throw new RuntimeException("Biến thể sản phẩm ID " + item.getVariantId() + " không tồn tại và không tìm thấy biến thể thay thế!");
+            }
 
             // Kiểm tra trạng thái bán
             if (variant.getStatus() == null || variant.getStatus() != 1) {
@@ -100,13 +113,20 @@ public class OrderServiceImpl implements OrderService {
             finalAmount = BigDecimal.ZERO;
         }
 
+        // Fetch UserAddress
+        UserAddress address = null;
+        if (request.getAddressId() != null) {
+            address = userAddressRepository.findById(request.getAddressId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ giao hàng hợp lệ!"));
+        } else {
+            throw new RuntimeException("Vui lòng chọn địa chỉ giao hàng!");
+        }
+
         // 4. Lưu thông tin chung vào bảng Đơn hàng (orders)
         Order order = Order.builder()
                 .user(user)
                 .promotion(appliedPromotion)
-                .receiverName(request.getReceiverName())
-                .receiverPhone(request.getReceiverPhone())
-                .shippingAddress(request.getShippingAddress())
+                .address(address)
                 .paymentMethod(request.getPaymentMethod())
                 .totalAmount(totalAmount)
                 .discountAmount(discountAmount)

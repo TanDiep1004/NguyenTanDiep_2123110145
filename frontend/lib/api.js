@@ -40,7 +40,7 @@ export async function fetchApi(endpoint, options = {}) {
 
     return json;
   } catch (error) {
-    console.error(`[API Error] ${endpoint}:`, error.message);
+    console.warn(`[API Warning] ${endpoint}:`, error.message);
     throw error;
   }
 }

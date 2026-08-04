@@ -2,6 +2,10 @@ package com.example.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_addresses")
@@ -9,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UserAddress {
 
     @Id
@@ -17,27 +22,32 @@ public class UserAddress {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("addresses")
     private User user;
 
     @Column(name = "receiver_name", nullable = false, length = 100)
     private String receiverName;
 
-    @Column(name = "receiver_phone", nullable = false, length = 20)
-    private String receiverPhone;
+    @Column(name = "phone_number", nullable = false, length = 20)
+    private String phoneNumber;
 
-    @Column(nullable = false, length = 100)
-    private String province;
+    @Column(name = "address_detail", nullable = false, length = 255)
+    private String addressDetail;
 
-    @Column(nullable = false, length = 100)
-    private String district;
-
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String ward;
 
-    @Column(name = "street_address", columnDefinition = "TEXT", nullable = false)
-    private String streetAddress;
+    @Column(length = 100)
+    private String district;
 
-    @Column(name = "is_default", columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Column(length = 100)
+    private String city;
+
+    @Column(name = "is_default")
     @Builder.Default
-    private Integer isDefault = 0;
+    private Boolean isDefault = false;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 }

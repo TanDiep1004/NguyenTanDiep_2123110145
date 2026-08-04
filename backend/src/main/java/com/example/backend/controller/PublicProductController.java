@@ -21,7 +21,7 @@ public class PublicProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Product>>> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findByStatus(1);
         return ResponseEntity.ok(ApiResponse.success(products, "Lấy danh sách kính thành công!"));
     }
 
