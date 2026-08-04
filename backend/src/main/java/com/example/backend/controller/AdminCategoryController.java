@@ -1,0 +1,94 @@
+package com.example.backend.controller;
+
+import com.example.backend.dto.ApiResponse;
+import com.example.backend.entity.Category;
+import com.example.backend.entity.Product;
+import com.example.backend.entity.ProductImage;
+import com.example.backend.entity.ProductVariant;
+import com.example.backend.repository.CategoryRepository;
+import com.example.backend.repository.ProductImageRepository;
+import com.example.backend.repository.ProductRepository;
+import com.example.backend.repository.ProductVariantRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/admin/categories")
+@RequiredArgsConstructor
+public class AdminCategoryController {
+
+    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final ProductImageRepository productImageRepository;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return ResponseEntity.ok(ApiResponse.success(categories, "Lấy danh sách Danh mục thành công!"));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Category>> createCategory(@RequestBody Category category) {
+        if (category.getSlug() == null || category.getSlug().isEmpty()) {
+            category.setSlug(category.getName().toLowerCase().replaceAll("[^a-z0-9]", "-"));
+        }
+        if (category.getStatus() == null) {
+            category.setStatus(1);
+        }
+        Category saved = categoryRepository.save(category);
+        return ResponseEntity.ok(ApiResponse.success(saved, "Thêm Danh mục mới thành công!"));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Category>> updateCategory(@PathVariable Integer id, @RequestBody Category req) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Danh mục ID: " + id));
+
+        category.setName(req.getName());
+        if (req.getSlug() != null && !req.getSlug().isEmpty()) {
+            category.setSlug(req.getSlug());
+        }
+        category.setDescription(req.getDescription());
+        if (req.getSortOrder() != null) {
+            category.setSortOrder(req.getSortOrder());
+        }
+        if (req.getStatus() != null) {
+            category.setStatus(req.getStatus());
+        }
+
+        Category updated = categoryRepository.save(category);
+        return ResponseEntity.ok(ApiResponse.success(updated, "Cập nhật Danh mục thành công!"));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> deleteCategory(@PathVariable Integer id) {
+        if (!categoryRepository.existsById(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không tìm thấy Danh mục để xóa!"));
+        }
+
+        try {
+            // Tự động giải phóng các sản phẩm thuộc danh mục này trước khi xóa
+            List<Product> products = productRepository.findByCategoryId(id);
+            for (Product p : products) {
+                List<ProductVariant> variants = productVariantRepository.findByProductId(p.getId());
+                productVariantRepository.deleteAll(variants);
+
+                List<ProductImage> images = productImageRepository.findByProductId(p.getId());
+                productImageRepository.deleteAll(images);
+
+                productRepository.delete(p);
+            }
+
+            categoryRepository.deleteById(id);
+            return ResponseEntity.ok(ApiResponse.success("Xóa", "Xóa Danh mục thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa danh mục: " + e.getMessage()));
+        }
+    }
+}
