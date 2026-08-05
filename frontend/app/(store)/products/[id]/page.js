@@ -142,6 +142,9 @@ export default function ProductDetailPage({ params }) {
 
   // Đơn giá thay đổi realtime theo biến thể chọn
   const displayPrice = matchedVariant?.price ? Number(matchedVariant.price) : (product.price ? Number(product.price) : 1500000);
+  const originalPrice = product.originalPrice && product.originalPrice > displayPrice ? Number(product.originalPrice) : null;
+  const discountPercent = originalPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
+  
   const stockQuantity = matchedVariant?.stockQuantity ?? 50;
 
   const handleAddToCart = () => {
@@ -217,12 +220,16 @@ export default function ProductDetailPage({ params }) {
           <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl space-y-2">
             <div className="flex items-baseline gap-4">
               <span className="text-3xl font-black text-emerald-400">{displayPrice.toLocaleString('vi-VN')} VNĐ</span>
-              <span className="text-sm text-slate-500 line-through font-medium">
-                {Math.round(displayPrice * 1.25).toLocaleString('vi-VN')} VNĐ
-              </span>
-              <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/30">
-                Tiết kiệm 20%
-              </span>
+              {originalPrice && (
+                <>
+                  <span className="text-sm text-slate-500 line-through font-medium">
+                    {originalPrice.toLocaleString('vi-VN')} VNĐ
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/30">
+                    Tiết kiệm {discountPercent}%
+                  </span>
+                </>
+              )}
             </div>
             <div className="text-xs font-bold flex items-center gap-2">
               <span className="text-slate-400">Trạng thái kho hàng:</span>
