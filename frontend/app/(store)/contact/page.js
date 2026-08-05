@@ -17,8 +17,8 @@ export default function ContactPage() {
   
   const [sysSettings, setSysSettings] = useState({
     hotline: '1900 8888',
-    email: 'support@matkinh.com',
-    address: '123 Đường 3/2, Phường 10, Quận 10, TP. Hồ Chí Minh'
+    email_contact: 'support@matkinh.com',
+    store_address: '123 Đường 3/2, Phường 10, Quận 10, TP. Hồ Chí Minh'
   });
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-white">Địa chỉ Cửa hàng</p>
-                  <p>{sysSettings.address}</p>
+                  <p>{sysSettings.store_address || '123 Đường 3/2, Phường 10, Quận 10, TP. Hồ Chí Minh'}</p>
                 </div>
               </div>
 
@@ -123,7 +123,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-white">Email CSKH</p>
-                  <p>{sysSettings.email}</p>
+                  <p>{sysSettings.email_contact || 'support@matkinh.com'}</p>
                 </div>
               </div>
             </div>
