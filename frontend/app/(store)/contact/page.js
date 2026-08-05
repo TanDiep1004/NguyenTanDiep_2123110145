@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle2 } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 
@@ -14,6 +14,36 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  
+  const [sysSettings, setSysSettings] = useState({
+    hotline: '1900 8888',
+    email: 'support@matkinh.com',
+    address: '123 Đường 3/2, Phường 10, Quận 10, TP. Hồ Chí Minh'
+  });
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const saved = localStorage.getItem('system_settings');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setSysSettings((prev) => ({ ...prev, ...parsed }));
+        }
+      } catch (e) {}
+
+      try {
+        const res = await fetchApi('/public/settings');
+        if (res.data && res.data.length > 0) {
+          const obj = {};
+          res.data.forEach((item) => {
+            if (item.keyName) obj[item.keyName] = item.keyValue;
+          });
+          setSysSettings((prev) => ({ ...prev, ...obj }));
+        }
+      } catch (e) {}
+    }
+    loadSettings();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +103,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-white">Địa chỉ Cửa hàng</p>
-                  <p>123 Đường 3/2, Phường 10, Quận 10, TP. Hồ Chí Minh</p>
+                  <p>{sysSettings.address}</p>
                 </div>
               </div>
 
@@ -83,7 +113,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-white">Hotline Hỗ trợ (24/7)</p>
-                  <p>1900 8888</p>
+                  <p>{sysSettings.hotline}</p>
                 </div>
               </div>
 
@@ -93,7 +123,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-bold text-white">Email CSKH</p>
-                  <p>support@matkinh.com</p>
+                  <p>{sysSettings.email}</p>
                 </div>
               </div>
             </div>
