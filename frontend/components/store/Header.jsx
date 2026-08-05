@@ -242,7 +242,7 @@ export default function Header() {
             </Link>
           </li>
           <li className="ml-auto">
-            <Link href="/cart" onClick={handleCartClick} className="text-emerald-400 flex items-center gap-1 hover:text-emerald-300">
+            <Link href="/promotions" className="text-emerald-400 flex items-center gap-1 hover:text-emerald-300 transition-colors">
               <Tag className="w-3.5 h-3.5" /> Mã Khuyến Mãi HOT
             </Link>
           </li>
