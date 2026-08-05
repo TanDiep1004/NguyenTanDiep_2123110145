@@ -11,6 +11,7 @@ export default function Footer() {
     email_contact: 'support@matkinh.com',
     store_address: '123 Đường 3/2, Quận 10, TP. Hồ Chí Minh',
   });
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     async function loadSettings() {
@@ -37,6 +38,15 @@ export default function Footer() {
     }
     loadSettings();
   }, []);
+
+  const handleSubscribe = () => {
+    if (!email || !email.includes('@')) {
+      alert('Vui lòng nhập một địa chỉ email hợp lệ!');
+      return;
+    }
+    alert('Đăng ký thành công! Voucher giảm 50k sẽ được gửi đến email ' + email + ' trong ít phút.');
+    setEmail('');
+  };
 
   return (
     <footer className="bg-slate-950 text-slate-400 text-xs border-t border-slate-800/80 pt-12 pb-8">
@@ -94,10 +104,16 @@ export default function Footer() {
           <div className="flex gap-2">
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
               placeholder="Email của bạn..."
               className="w-full bg-slate-900 text-white text-xs px-3 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500"
             />
-            <button className="px-4 py-2.5 bg-emerald-500 font-bold text-slate-950 rounded-xl hover:bg-emerald-400 shrink-0 cursor-pointer">
+            <button 
+              onClick={handleSubscribe}
+              className="px-4 py-2.5 bg-emerald-500 font-bold text-slate-950 rounded-xl hover:bg-emerald-400 shrink-0 cursor-pointer"
+            >
               Đăng ký
             </button>
           </div>
