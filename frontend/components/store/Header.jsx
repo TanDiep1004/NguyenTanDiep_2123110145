@@ -11,7 +11,6 @@ import { getUser, getToken, isAdmin, logout } from '@/lib/auth';
 export default function Header() {
   const router = useRouter();
   const { cartCount } = useCart();
-  const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUserState] = useState(null);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
@@ -22,19 +21,7 @@ export default function Header() {
   });
 
   useEffect(() => {
-    async function loadCategories() {
-      try {
-        const res = await fetchApi('/public/categories');
-        if (res.data) setCategories(res.data);
-      } catch (e) {
-        setCategories([
-          { id: 1, name: 'Gọng Kính Nam', slug: 'gong-kinh-nam' },
-          { id: 2, name: 'Gọng Kính Nữ', slug: 'gong-kinh-nu' },
-          { id: 3, name: 'Kính Râm Thời Trang', slug: 'kinh-ram-thoi-trang' },
-          { id: 4, name: 'Tròng Kính Cận', slug: 'trong-kinh-can' },
-        ]);
-      }
-    }
+
 
     async function loadSettings() {
       // Try local storage first
@@ -59,7 +46,7 @@ export default function Header() {
       } catch (e) {}
     }
 
-    loadCategories();
+
     loadSettings();
     setUserState(getUser());
     setUserIsAdmin(isAdmin());
@@ -244,13 +231,11 @@ export default function Header() {
               Tất Cả Mắt Kính
             </Link>
           </li>
-          {categories.map((cat) => (
-            <li key={cat.id}>
-              <Link href={`/products?category=${cat.id}`} className="hover:text-emerald-400 transition-colors whitespace-nowrap">
-                {cat.name}
-              </Link>
-            </li>
-          ))}
+          <li>
+            <Link href="/news" className="hover:text-emerald-400 transition-colors">
+              Tin Tức
+            </Link>
+          </li>
           <li className="ml-auto">
             <Link href="/cart" onClick={handleCartClick} className="text-emerald-400 flex items-center gap-1 hover:text-emerald-300">
               <Tag className="w-3.5 h-3.5" /> Mã Khuyến Mãi HOT
