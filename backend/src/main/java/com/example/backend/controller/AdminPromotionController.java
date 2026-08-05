@@ -23,6 +23,7 @@ public class AdminPromotionController {
 
     private final PromotionRepository promotionRepository;
     private final PromotionProductRepository promotionProductRepository;
+    private final com.example.backend.repository.ProductRepository productRepository;
 
     @Data
     public static class PromotionDto {
@@ -62,6 +63,8 @@ public class AdminPromotionController {
             for (Integer productId : dto.getProductIds()) {
                 PromotionProduct pp = new PromotionProduct();
                 pp.setId(new PromotionProductId(productId, saved.getId()));
+                pp.setPromotion(saved);
+                pp.setProduct(productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found")));
                 promotionProductRepository.save(pp);
             }
         }
@@ -96,6 +99,8 @@ public class AdminPromotionController {
             for (Integer productId : dto.getProductIds()) {
                 PromotionProduct pp = new PromotionProduct();
                 pp.setId(new PromotionProductId(productId, updated.getId()));
+                pp.setPromotion(updated);
+                pp.setProduct(productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found")));
                 promotionProductRepository.save(pp);
             }
         }
