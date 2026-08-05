@@ -236,6 +236,11 @@ export default function Header() {
               Tin Tức
             </Link>
           </li>
+          <li>
+            <Link href="/contact" className="hover:text-emerald-400 transition-colors">
+              Liên Hệ
+            </Link>
+          </li>
           <li className="ml-auto">
             <Link href="/cart" onClick={handleCartClick} className="text-emerald-400 flex items-center gap-1 hover:text-emerald-300">
               <Tag className="w-3.5 h-3.5" /> Mã Khuyến Mãi HOT
