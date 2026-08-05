@@ -48,10 +48,10 @@ export default function OrderSuccessPage({ params }) {
           <ArrowRight className="w-4 h-4" />
         </Link>
         <Link
-          href="/admin/orders"
+          href="/orders"
           className="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-800"
         >
-          Xem trong Quản lý Admin
+          Xem lịch sử đơn hàng
         </Link>
       </div>
     </div>
