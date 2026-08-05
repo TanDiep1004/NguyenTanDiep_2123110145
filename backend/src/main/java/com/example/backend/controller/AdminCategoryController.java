@@ -1,5 +1,8 @@
 package com.example.backend.controller;
 
+import com.example.backend.security.CustomUserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.entity.Category;
 import com.example.backend.entity.Product;
@@ -46,7 +49,10 @@ public class AdminCategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Category>> updateCategory(@PathVariable Integer id, @RequestBody Category req) {
+    public ResponseEntity<ApiResponse<Category>> updateCategory(
+            @PathVariable Integer id, 
+            @RequestBody Category req,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Danh mục ID: " + id));
 
@@ -60,6 +66,10 @@ public class AdminCategoryController {
         }
         if (req.getStatus() != null) {
             category.setStatus(req.getStatus());
+        }
+        
+        if (userDetails != null && userDetails.getUser() != null) {
+            category.setUpdatedBy(userDetails.getUser());
         }
 
         Category updated = categoryRepository.save(category);

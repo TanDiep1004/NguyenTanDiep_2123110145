@@ -49,6 +49,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
     private User createdBy;
 
     @UpdateTimestamp
@@ -57,5 +58,6 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
     private User updatedBy;
 }
