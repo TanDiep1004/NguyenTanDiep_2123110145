@@ -15,7 +15,7 @@ export default function PromotionsPage() {
       try {
         setLoading(true);
         const res = await fetchApi('/public/promotions');
-        if (res.code === 200 && res.data) {
+        if (res.status === 200 && res.data) {
           setPromotions(res.data);
         }
       } catch (err) {
