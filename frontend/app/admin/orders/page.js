@@ -160,7 +160,7 @@ export default function OrdersPage() {
                   </div>
                 </td>
                 <td className="p-4 font-bold text-emerald-400 text-sm">
-                  {Number(o.finalAmount || o.totalAmount).toLocaleString('vi-VN')} đ
+                  {Number(o.finalAmount ?? o.totalAmount).toLocaleString('vi-VN')} đ
                   <div className="text-[10px] text-slate-500 font-normal mt-0.5">
                     {o.paymentMethod || 'COD'}
                   </div>

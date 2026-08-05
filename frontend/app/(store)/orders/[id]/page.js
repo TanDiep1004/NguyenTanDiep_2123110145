@@ -221,7 +221,7 @@ export default function OrderDetailPage({ params }) {
             </div>
             <div className="flex justify-between text-white font-black text-lg pt-3 border-t border-slate-800">
               <span>Tổng cộng:</span>
-              <span className="text-emerald-400">{Number(order.finalAmount || order.totalAmount).toLocaleString('vi-VN')} đ</span>
+              <span className="text-emerald-400">{Number(order.finalAmount ?? order.totalAmount).toLocaleString('vi-VN')} đ</span>
             </div>
           </div>
         </div>

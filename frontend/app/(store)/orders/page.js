@@ -175,7 +175,7 @@ export default function OrderHistoryPage() {
                 <div className="px-6 py-4 bg-slate-900/80 border-t border-slate-800 flex items-center justify-between">
                   <div className="text-xs">
                     <span className="text-slate-400">Thành tiền: </span>
-                    <span className="text-lg font-black text-white">{Number(order.finalAmount || order.totalAmount).toLocaleString('vi-VN')} đ</span>
+                    <span className="text-lg font-black text-white">{Number(order.finalAmount ?? order.totalAmount).toLocaleString('vi-VN')} đ</span>
                   </div>
                   <Link 
                     href={`/orders/${order.id}`}
