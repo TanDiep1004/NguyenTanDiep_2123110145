@@ -133,6 +133,7 @@ export default function CategoriesPage() {
                 <th className="p-4">Mô tả</th>
                 <th className="p-4">Thứ tự</th>
                 <th className="p-4">Trạng thái</th>
+                <th className="p-4">Cập nhật bởi</th>
                 <th className="p-4 text-right">Thao tác</th>
               </tr>
             </thead>
@@ -150,6 +151,16 @@ export default function CategoriesPage() {
                     }`}>
                       {c.status === 1 ? 'Hiển thị' : 'Ẩn'}
                     </span>
+                  </td>
+                  <td className="p-4 text-[11px] text-slate-400">
+                    {c.updatedBy ? (
+                      <div>
+                        <div className="font-bold text-slate-300">{c.updatedBy.fullName || c.updatedBy.email}</div>
+                        <div>{c.updatedAt ? new Date(c.updatedAt).toLocaleString('vi-VN') : ''}</div>
+                      </div>
+                    ) : (
+                      <span className="italic text-slate-500">Chưa có</span>
+                    )}
                   </td>
                   <td className="p-4 text-right space-x-2">
                     <button
