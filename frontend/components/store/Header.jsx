@@ -232,7 +232,7 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link href="/news" className="hover:text-emerald-400 transition-colors">
+            <Link href="/articles" className="hover:text-emerald-400 transition-colors">
               Tin Tức
             </Link>
           </li>
