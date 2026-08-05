@@ -10,7 +10,7 @@ import { getUser, getToken } from '@/lib/auth';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, cartSubtotal, discountAmount, cartTotal, clearCart } = useCart();
+  const { cartItems, cartSubtotal, discountAmount, cartTotal, clearCart, promotion } = useCart();
   const currentUser = getUser();
 
   const [addresses, setAddresses] = useState([]);
@@ -142,6 +142,7 @@ export default function CheckoutPage() {
       totalAmount: cartSubtotal,
       discountAmount,
       finalAmount: cartTotal,
+      promotionCode: promotion?.code || null,
       status: 'Pending',
       createdAt: new Date().toISOString(),
       items: cartItems.map((item) => {
