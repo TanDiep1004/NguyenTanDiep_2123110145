@@ -9,10 +9,17 @@ import { productService } from '@/services/productService';
 function ProductsContent() {
   const searchParams = useSearchParams();
   const brandIdParam = searchParams.get('brandId');
+  const initialSearch = searchParams.get('search');
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch || '');
+
+  useEffect(() => {
+    if (initialSearch !== null) {
+      setSearchQuery(initialSearch);
+    }
+  }, [initialSearch]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedBrand, setSelectedBrand] = useState('ALL');
   const [priceFilter, setPriceFilter] = useState('ALL');

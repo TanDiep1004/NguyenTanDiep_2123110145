@@ -88,7 +88,7 @@ export default function UsersPage() {
                 <td className="p-4 font-mono text-slate-300">{u.email}</td>
                 <td className="p-4 text-slate-400">{u.phone || 'N/A'}</td>
                 <td className="p-4">
-                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase ${
+                  <span className={`whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold uppercase ${
                     u.role === 'admin' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
                   }`}>
                     {u.role || 'CUSTOMER'}
@@ -96,7 +96,7 @@ export default function UsersPage() {
                 </td>
                 <td className="p-4 text-slate-400 max-w-xs truncate">{u.address || 'Chưa có địa chỉ'}</td>
                 <td className="p-4">
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     Hoạt động
                   </span>
                 </td>

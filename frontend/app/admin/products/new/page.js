@@ -167,13 +167,11 @@ export default function NewProductPage() {
             <div>
               <label className="block text-xs font-bold text-emerald-400 mb-1">Giá bán chính thức (VNĐ) *</label>
               <input
-                type="number"
+                type="text"
                 required
-                min="0"
-                step="1000"
                 placeholder="1500000"
                 value={part1.price}
-                onChange={(e) => setPart1({ ...part1, price: e.target.value })}
+                onChange={(e) => setPart1({ ...part1, price: e.target.value.replace(/\D/g, '') })}
                 className="w-full bg-slate-800 text-emerald-400 font-black text-sm px-4 py-3 rounded-xl border border-emerald-500/50 focus:outline-none focus:border-emerald-400"
               />
             </div>
@@ -181,12 +179,10 @@ export default function NewProductPage() {
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1">Giá gốc niêm yết (VNĐ)</label>
               <input
-                type="number"
-                min="0"
-                step="1000"
+                type="text"
                 placeholder="1875000"
                 value={part1.originalPrice}
-                onChange={(e) => setPart1({ ...part1, originalPrice: e.target.value })}
+                onChange={(e) => setPart1({ ...part1, originalPrice: e.target.value.replace(/\D/g, '') })}
                 className="w-full bg-slate-800 text-slate-300 text-xs px-4 py-3 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500"
               />
             </div>

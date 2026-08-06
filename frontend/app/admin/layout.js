@@ -12,31 +12,26 @@ export default function AdminLayout({ children }) {
   const [mounted, setMounted] = useState(false);
   const [authorized, setAuthorized] = useState(false);
 
-  const isLoginPage = pathname === '/admin/login';
-
   useEffect(() => {
     setMounted(true);
     const token = getToken();
-    const user = getUser();
 
-    if (!isLoginPage) {
-      if (!token) {
-        router.push('/admin/login');
-        return;
-      }
+    if (!token) {
+      router.push('/login');
+      return;
+    }
 
-      // Check strictly if role is admin or staff
-      if (!isAdmin()) {
-        alert('YÊU CẦU ĐĂNG NHẬP ADMIN:\nTài khoản hiện tại của bạn không có quyền truy cập. Vui lòng đăng nhập bằng tài khoản Quản trị viên!');
-        router.push('/admin/login');
-        return;
-      }
+    // Check strictly if role is admin or staff
+    if (!isAdmin()) {
+      alert('YÊU CẦU ĐĂNG NHẬP ADMIN:\nTài khoản hiện tại của bạn không có quyền truy cập. Vui lòng đăng nhập bằng tài khoản Quản trị viên!');
+      router.push('/login');
+      return;
     }
 
     setAuthorized(true);
-  }, [pathname, isLoginPage, router]);
+  }, [pathname, router]);
 
-  if (!mounted || (!authorized && !isLoginPage)) {
+  if (!mounted || !authorized) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-200 flex items-center justify-center">
         <div className="flex items-center gap-3">
@@ -45,10 +40,6 @@ export default function AdminLayout({ children }) {
         </div>
       </div>
     );
-  }
-
-  if (isLoginPage) {
-    return <main className="min-h-screen bg-slate-950">{children}</main>;
   }
 
   return (

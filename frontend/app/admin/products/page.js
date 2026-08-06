@@ -238,7 +238,7 @@ export default function ProductsListPage() {
                       {Number(pPrice).toLocaleString('vi-VN')} VNĐ
                     </td>
                     <td className="p-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                      <span className={`whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold border ${
                         p.status === 1 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                       }`}>
                         {p.status === 1 ? 'Đang bán' : 'Ẩn'}
@@ -322,11 +322,11 @@ export default function ProductsListPage() {
                 <div>
                   <label className="block text-emerald-400 font-bold mb-1">Giá bán chính thức (VNĐ) *</label>
                   <input
-                    type="number"
+                    type="text"
                     required
                     placeholder="Ví dụ: 1500000"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value.replace(/\D/g, '') })}
                     className="w-full bg-slate-800 text-emerald-400 font-bold text-sm p-3 rounded-xl border border-emerald-500/40 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -334,10 +334,10 @@ export default function ProductsListPage() {
                 <div>
                   <label className="block text-slate-400 font-semibold mb-1">Giá gốc niêm yết (VNĐ)</label>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Ví dụ: 1875000"
                     value={formData.originalPrice}
-                    onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value.replace(/\D/g, '') })}
                     className="w-full bg-slate-800 text-slate-300 p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500"
                   />
                 </div>

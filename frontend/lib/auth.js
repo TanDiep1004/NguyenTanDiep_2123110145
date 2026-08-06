@@ -1,10 +1,5 @@
-export const getPrefix = () => {
-  if (typeof window === 'undefined') return '';
-  return window.location.pathname.startsWith('/admin') ? 'admin_' : '';
-};
-
-export const getTokenKey = () => `${getPrefix()}auth_token`;
-export const getUserKey = () => `${getPrefix()}auth_user`;
+export const getTokenKey = () => 'auth_token';
+export const getUserKey = () => 'auth_user';
 
 export const getToken = () => {
   if (typeof window === 'undefined') return null;
@@ -42,13 +37,12 @@ export const isAdmin = () => {
   const user = getUser();
   if (!user) return false;
   const role = user.role?.toLowerCase();
-  return role === 'admin' || role === 'staff';
+  return role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff';
 };
 
 export const logout = () => {
-  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
   removeToken();
   if (typeof window !== 'undefined') {
-    window.location.href = isAdminRoute ? '/admin/login' : '/login';
+    window.location.href = '/login';
   }
 };

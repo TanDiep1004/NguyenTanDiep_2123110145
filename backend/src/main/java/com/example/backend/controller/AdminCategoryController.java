@@ -1,8 +1,12 @@
 package com.example.backend.controller;
 
 import com.example.backend.security.CustomUserDetails;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
+import com.example.backend.security.JwtTokenProvider;
+import com.example.backend.security.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.entity.Category;
 import com.example.backend.entity.Product;
@@ -16,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -24,7 +29,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminCategoryController {
 
-    private final CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+    
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+    
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
@@ -37,13 +50,15 @@ public class AdminCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Category>> createCategory(@RequestBody Category category) {
+    public ResponseEntity<ApiResponse<Category>> createCategory(
+            @RequestBody Category category) {
         if (category.getSlug() == null || category.getSlug().isEmpty()) {
             category.setSlug(category.getName().toLowerCase().replaceAll("[^a-z0-9]", "-"));
         }
         if (category.getStatus() == null) {
             category.setStatus(1);
         }
+
         Category saved = categoryRepository.save(category);
         return ResponseEntity.ok(ApiResponse.success(saved, "Thêm Danh mục mới thành công!"));
     }
@@ -51,8 +66,7 @@ public class AdminCategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Category>> updateCategory(
             @PathVariable Integer id, 
-            @RequestBody Category req,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @RequestBody Category req) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Danh mục ID: " + id));
 
@@ -66,10 +80,6 @@ public class AdminCategoryController {
         }
         if (req.getStatus() != null) {
             category.setStatus(req.getStatus());
-        }
-        
-        if (userDetails != null && userDetails.getUser() != null) {
-            category.setUpdatedBy(userDetails.getUser());
         }
 
         Category updated = categoryRepository.save(category);

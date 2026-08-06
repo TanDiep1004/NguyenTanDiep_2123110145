@@ -11,9 +11,9 @@ export function middleware(request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Protect /admin routes (except /admin/login): Require auth_token cookie
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login') && !token) {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+  // Protect /admin routes: Require auth_token cookie
+  if (pathname.startsWith('/admin') && !token) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();

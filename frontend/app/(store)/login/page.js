@@ -20,7 +20,7 @@ export default function CustomerLoginPage() {
     if (token) {
       if (typeof window !== 'undefined') {
         const role = currentUser?.role?.toLowerCase();
-        if (role === 'admin' || role === 'staff') {
+        if (role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff') {
           window.location.href = '/admin/dashboard';
         } else {
           window.location.href = '/';
@@ -53,7 +53,7 @@ export default function CustomerLoginPage() {
         setUser(res.data);
         alert(`Đăng nhập thành công! Xin chào ${res.data.fullName || res.data.email}`);
         const role = (res.data.role || 'customer').toLowerCase();
-        if (role === 'admin' || role === 'staff') {
+        if (role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff') {
           window.location.href = '/admin/dashboard';
         } else {
           window.location.href = '/';
@@ -128,8 +128,8 @@ export default function CustomerLoginPage() {
           <div className="inline-flex p-3 rounded-2xl bg-slate-950 border border-emerald-500/50 text-emerald-400 mb-1">
             <Glasses className="w-8 h-8 text-emerald-400" />
           </div>
-          <h1 className="text-2xl font-black text-white">Đăng Nhập Khách Hàng</h1>
-          <p className="text-xs text-slate-400">Đăng nhập tài khoản để theo dõi đơn hàng và ưu đãi dành riêng cho bạn</p>
+          <h1 className="text-2xl font-black text-white">Đăng Nhập Hệ Thống</h1>
+          <p className="text-xs text-slate-400">Đăng nhập tài khoản để mua sắm hoặc quản lý hệ thống</p>
         </div>
 
         {error && (
@@ -191,12 +191,6 @@ export default function CustomerLoginPage() {
             Chưa có tài khoản?{' '}
             <Link href="/register" className="text-emerald-400 font-bold hover:underline">
               Đăng ký tài khoản mới ngay
-            </Link>
-          </div>
-          <div>
-            Bạn là Quản trị viên?{' '}
-            <Link href="/admin/login" className="text-slate-400 underline hover:text-white">
-              Đăng nhập Buồng Lái Admin
             </Link>
           </div>
         </div>
