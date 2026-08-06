@@ -14,17 +14,29 @@ export default function CustomerLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const doRedirect = (role) => {
+    if (role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff') {
+      window.location.href = '/admin/dashboard';
+      return;
+    }
+    
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get('redirect');
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   useEffect(() => {
     const token = getToken();
     const currentUser = getUser();
     if (token) {
       if (typeof window !== 'undefined') {
+        setToken(token); // Sync cookie just in case it was missing
         const role = currentUser?.role?.toLowerCase();
-        if (role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff') {
-          window.location.href = '/admin/dashboard';
-        } else {
-          window.location.href = '/';
-        }
+        doRedirect(role);
       }
     }
   }, []);
@@ -53,11 +65,7 @@ export default function CustomerLoginPage() {
         setUser(res.data);
         alert(`Đăng nhập thành công! Xin chào ${res.data.fullName || res.data.email}`);
         const role = (res.data.role || 'customer').toLowerCase();
-        if (role === 'admin' || role === 'staff' || role === 'role_admin' || role === 'role_staff') {
-          window.location.href = '/admin/dashboard';
-        } else {
-          window.location.href = '/';
-        }
+        doRedirect(role);
         return;
       }
     } catch (err) {
@@ -75,7 +83,7 @@ export default function CustomerLoginPage() {
           setToken(matched.token || 'customer-token-' + Date.now());
           setUser(matched);
           alert(`Đăng nhập thành công! Xin chào ${matched.fullName}`);
-          window.location.href = '/';
+          doRedirect(matched.role?.toLowerCase());
           return;
         }
       } catch (localErr) {}
@@ -99,7 +107,7 @@ export default function CustomerLoginPage() {
           setToken(regRes.data.token);
           setUser(regRes.data);
           alert(`Đăng nhập thành công! Xin chào ${regRes.data.fullName}`);
-          window.location.href = '/';
+          doRedirect(regRes.data.role?.toLowerCase());
           return;
         }
       } catch (regErr) {
@@ -114,7 +122,7 @@ export default function CustomerLoginPage() {
         setToken(loggedUser.token);
         setUser(loggedUser);
         alert(`Đăng nhập thành công! Xin chào ${loggedUser.fullName}`);
-        window.location.href = '/';
+        doRedirect(loggedUser.role?.toLowerCase());
       }
     } finally {
       setLoading(false);

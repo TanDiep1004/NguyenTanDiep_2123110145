@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { FolderTree, Plus, Edit2, Trash2, X, Save } from 'lucide-react';
@@ -162,7 +162,7 @@ export default function CategoriesPage() {
                       <span className="italic text-slate-500">Chưa có</span>
                     )}
                   </td>
-                  <td className="p-4 text-right space-x-2">
+                  <td className="p-4 text-right space-x-2 whitespace-nowrap">
                     <button
                       onClick={() => handleOpenEditModal(c)}
                       className="p-2 text-slate-400 hover:text-amber-400 bg-slate-800 hover:bg-slate-700 rounded-lg cursor-pointer transition-all"

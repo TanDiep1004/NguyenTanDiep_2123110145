@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { Award, Plus, Edit2, Trash2, X, Save, Upload, Image as ImageIcon } from 'lucide-react';
@@ -175,7 +175,7 @@ export default function BrandsPage() {
                       {b.status === 1 ? 'Hiển thị' : 'Ẩn'}
                     </span>
                   </td>
-                  <td className="p-4 text-right space-x-2">
+                  <td className="p-4 text-right space-x-2 whitespace-nowrap">
                     <button
                       onClick={() => handleOpenEditModal(b)}
                       className="p-2 text-slate-400 hover:text-amber-400 bg-slate-800 hover:bg-slate-700 rounded-lg cursor-pointer transition-all"

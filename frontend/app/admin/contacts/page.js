@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { Mail, CheckCircle, Trash2, Clock, Check } from 'lucide-react';
@@ -97,7 +97,7 @@ export default function ContactsPage() {
                       {c.status === 'PROCESSED' ? 'Đã xử lý' : 'Chờ tư vấn'}
                     </span>
                   </td>
-                  <td className="p-4 text-right space-x-2">
+                  <td className="p-4 text-right space-x-2 whitespace-nowrap">
                     {c.status !== 'PROCESSED' && (
                       <button
                         onClick={() => handleUpdateStatus(c.id, 'PROCESSED')}
