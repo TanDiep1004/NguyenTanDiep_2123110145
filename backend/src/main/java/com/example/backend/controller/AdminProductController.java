@@ -64,8 +64,8 @@ public class AdminProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Product>>> getAllProductsAdmin() {
-        List<Product> products = productRepository.findAll();
-        return ResponseEntity.ok(ApiResponse.success(products, "Lấy danh sách tất cả sản phẩm (Admin) thành công!"));
+        List<Product> products = productRepository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(ApiResponse.success(products, "Lấy danh sách sản phẩm thành công!"));
     }
 
     @PostMapping
@@ -215,6 +215,46 @@ public class AdminProductController {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa! Sản phẩm này đã phát sinh đơn hàng trong hệ thống. Để bảo toàn dữ liệu, vui lòng chuyển trạng thái sang 'Ẩn tạm thời'."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "Lỗi hệ thống khi xóa sản phẩm: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/variants")
+    @Transactional
+    public ResponseEntity<ApiResponse<ProductVariant>> addProductVariant(@PathVariable Integer id, @RequestBody VariantDto vDto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + id));
+
+        BigDecimal variantPrice = vDto.getPrice() != null && vDto.getPrice().compareTo(BigDecimal.ZERO) > 0 
+                ? vDto.getPrice() : product.getPrice();
+
+        ProductVariant v = ProductVariant.builder()
+                .product(product)
+                .color(vDto.getColor() != null ? vDto.getColor() : "Đen Nhám")
+                .degree(vDto.getDegree() != null ? vDto.getDegree() : "0.00 (Không độ)")
+                .price(variantPrice)
+                .stockQuantity(vDto.getStockQuantity() != null ? vDto.getStockQuantity() : 50)
+                .status(1)
+                .build();
+                
+        ProductVariant savedVariant = productVariantRepository.save(v);
+        return ResponseEntity.ok(ApiResponse.success(savedVariant, "Thêm biến thể mới thành công!"));
+    }
+
+    @DeleteMapping("/variants/{variantId}")
+    @Transactional
+    public ResponseEntity<ApiResponse<Void>> deleteProductVariant(@PathVariable Integer variantId) {
+        if (!productVariantRepository.existsById(variantId)) {
+            throw new RuntimeException("Không tìm thấy biến thể với ID: " + variantId);
+        }
+        
+        try {
+            productVariantRepository.deleteById(variantId);
+            productVariantRepository.flush();
+            return ResponseEntity.ok(ApiResponse.success(null, "Xóa biến thể thành công!"));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Không thể xóa biến thể này vì đã có đơn hàng."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Lỗi khi xóa biến thể: " + e.getMessage()));
         }
     }
 }

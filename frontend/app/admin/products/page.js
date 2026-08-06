@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -23,8 +23,15 @@ export default function ProductsListPage() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // Reset về trang 1 khi tìm kiếm
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -157,6 +164,11 @@ export default function ProductsListPage() {
     p.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Top Header Bar */}
@@ -213,7 +225,7 @@ export default function ProductsListPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80 text-slate-300">
-              {filteredProducts.map((p) => {
+              {currentProducts.map((p) => {
                 const raw = (p.images && p.images.length > 0) ? p.images[0].imageUrl : p.imageUrl;
                 const fallbackIdx = (Number(p.id) || 1) % SAFE_EYEWEAR_PHOTOS.length;
                 const safeFallback = SAFE_EYEWEAR_PHOTOS[fallbackIdx];
@@ -265,6 +277,44 @@ export default function ProductsListPage() {
               })}
             </tbody>
           </table>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="p-4 border-t border-slate-800 bg-slate-800/20 flex items-center justify-between">
+              <span className="text-xs text-slate-400">
+                Hiển thị trang <b className="text-emerald-400">{currentPage}</b> trên <b className="text-emerald-400">{totalPages}</b>
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg text-xs font-medium disabled:opacity-50 hover:bg-slate-700 transition-colors"
+                >
+                  Trước
+                </button>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20'
+                        : 'bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg text-xs font-medium disabled:opacity-50 hover:bg-slate-700 transition-colors"
+                >
+                  Sau
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

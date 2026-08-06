@@ -23,6 +23,14 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedBrand, setSelectedBrand] = useState('ALL');
   const [priceFilter, setPriceFilter] = useState('ALL');
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 6;
+
+  // Reset về trang 1 khi thay đổi bộ lọc
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedBrand, priceFilter]);
 
   useEffect(() => {
     async function loadProducts() {
@@ -79,6 +87,11 @@ function ProductsContent() {
 
     return true;
   });
+
+  const totalPages = Math.ceil(filtered.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filtered.slice(indexOfFirstProduct, indexOfLastProduct);
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 space-y-8">
@@ -183,7 +196,7 @@ function ProductsContent() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {filtered.map((product, idx) => (
+            {currentProducts.map((product, idx) => (
               <ProductCard key={product.id ? `prod-${product.id}-${idx}` : idx} product={product} />
             ))}
           </div>
@@ -191,6 +204,43 @@ function ProductsContent() {
           {filtered.length === 0 && (
             <div className="p-12 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400">
               Không tìm thấy mẫu kính nào phù hợp với bộ lọc đã chọn.
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-8">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-xl disabled:opacity-50 hover:bg-slate-800"
+              >
+                Trước
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl font-medium ${
+                      currentPage === i + 1
+                        ? 'bg-emerald-500 text-slate-950'
+                        : 'bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-xl disabled:opacity-50 hover:bg-slate-800"
+              >
+                Sau
+              </button>
             </div>
           )}
         </main>

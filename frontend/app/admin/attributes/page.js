@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sliders, Plus, Edit2, Trash2, ChevronRight, X, Save, Glasses, Check } from 'lucide-react';
 import { productService } from '@/services/productService';
+import { fetchApi } from '@/lib/api';
 
 export default function AttributesPage() {
   const [attributes, setAttributes] = useState([
@@ -146,7 +147,7 @@ export default function AttributesPage() {
     alert('Đã xóa giá trị thuộc tính!');
   };
 
-  const handleAssignVariantToProduct = (e) => {
+  const handleAssignVariantToProduct = async (e) => {
     e.preventDefault();
     if (!selectedProductId) {
       alert('Vui lòng chọn 1 sản phẩm để gán!');
@@ -154,51 +155,70 @@ export default function AttributesPage() {
     }
 
     const newVar = {
-      id: Date.now(),
       color: assignForm.color,
       degree: assignForm.degree,
       price: Number(assignForm.price),
       stockQuantity: Number(assignForm.stockQuantity),
     };
 
-    const updatedVars = [...productVariants, newVar];
-    setProductVariants(updatedVars);
+    try {
+      const res = await fetchApi(`/admin/products/${selectedProductId}/variants`, {
+        method: 'POST',
+        body: JSON.stringify(newVar)
+      });
+      
+      const createdVar = res.data;
+      const updatedVars = [...productVariants, createdVar];
+      setProductVariants(updatedVars);
 
-    // Cập nhật vào danh sách sản phẩm
-    const targetProd = productList.find(p => p.id.toString() === selectedProductId.toString());
-    if (targetProd) {
-      targetProd.variants = updatedVars;
-      try {
-        const storedProds = JSON.parse(localStorage.getItem('stored_products') || '[]');
-        const idx = storedProds.findIndex(p => p.id.toString() === selectedProductId.toString());
-        if (idx !== -1) {
-          storedProds[idx] = targetProd;
-        } else {
-          storedProds.unshift(targetProd);
-        }
-        localStorage.setItem('stored_products', JSON.stringify(storedProds));
-      } catch (err) {}
+      // Cập nhật vào danh sách sản phẩm
+      const targetProd = productList.find(p => p.id.toString() === selectedProductId.toString());
+      if (targetProd) {
+        targetProd.variants = updatedVars;
+        try {
+          const storedProds = JSON.parse(localStorage.getItem('stored_products') || '[]');
+          const idx = storedProds.findIndex(p => p.id.toString() === selectedProductId.toString());
+          if (idx !== -1) {
+            storedProds[idx] = targetProd;
+          } else {
+            storedProds.unshift(targetProd);
+          }
+          localStorage.setItem('stored_products', JSON.stringify(storedProds));
+        } catch (err) {}
+      }
+
+      alert(`Đã gán thành công Màu "${assignForm.color}" & Độ cận "${assignForm.degree}" cho sản phẩm "${targetProd?.name || ''}"!`);
+    } catch (error) {
+      alert('Lỗi khi thêm biến thể: ' + error.message);
     }
-
-    alert(`Đã gán thành công Màu "${assignForm.color}" & Độ cận "${assignForm.degree}" cho sản phẩm "${targetProd?.name || ''}"!`);
   };
 
-  const handleDeleteProductVariant = (varId) => {
+  const handleDeleteProductVariant = async (varId) => {
     if (!confirm('Xóa tùy chọn độ cận / màu sắc này khỏi sản phẩm?')) return;
-    const updatedVars = productVariants.filter(v => v.id !== varId);
-    setProductVariants(updatedVars);
+    
+    try {
+      await fetchApi(`/admin/products/variants/${varId}`, {
+        method: 'DELETE'
+      });
+      
+      const updatedVars = productVariants.filter(v => v.id !== varId);
+      setProductVariants(updatedVars);
 
-    const targetProd = productList.find(p => p.id.toString() === selectedProductId.toString());
-    if (targetProd) {
-      targetProd.variants = updatedVars;
-      try {
-        const storedProds = JSON.parse(localStorage.getItem('stored_products') || '[]');
-        const idx = storedProds.findIndex(p => p.id.toString() === selectedProductId.toString());
-        if (idx !== -1) {
-          storedProds[idx] = targetProd;
-          localStorage.setItem('stored_products', JSON.stringify(storedProds));
-        }
-      } catch (err) {}
+      const targetProd = productList.find(p => p.id.toString() === selectedProductId.toString());
+      if (targetProd) {
+        targetProd.variants = updatedVars;
+        try {
+          const storedProds = JSON.parse(localStorage.getItem('stored_products') || '[]');
+          const idx = storedProds.findIndex(p => p.id.toString() === selectedProductId.toString());
+          if (idx !== -1) {
+            storedProds[idx] = targetProd;
+            localStorage.setItem('stored_products', JSON.stringify(storedProds));
+          }
+        } catch (err) {}
+      }
+      alert('Xóa biến thể thành công!');
+    } catch (error) {
+      alert('Lỗi khi xóa biến thể: ' + error.message);
     }
   };
 

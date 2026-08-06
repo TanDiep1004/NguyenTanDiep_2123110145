@@ -68,63 +68,26 @@ export default function CustomerLoginPage() {
         doRedirect(role);
         return;
       }
-    } catch (err) {
-      // 1. Check local registered users list
-      try {
-        const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
-        const matched = registeredUsers.find(
-          (u) =>
-            u.email.toLowerCase() === formattedEmail.toLowerCase() ||
-            u.email.toLowerCase().includes(emailInput.toLowerCase()) ||
-            (u.fullName && u.fullName.toLowerCase().includes(emailInput.toLowerCase()))
-        );
+      } catch (err) {
+        // 1. Check local registered users list
+        try {
+          const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+          const matched = registeredUsers.find(
+            (u) =>
+              u.email.toLowerCase() === formattedEmail.toLowerCase() && u.password === password
+          );
 
-        if (matched) {
-          setToken(matched.token || 'customer-token-' + Date.now());
-          setUser(matched);
-          alert(`Đăng nhập thành công! Xin chào ${matched.fullName}`);
-          doRedirect(matched.role?.toLowerCase());
-          return;
-        }
-      } catch (localErr) {}
-
-      // 2. Fallback: Try to auto-register this demo user in the backend
-      const rawName = emailInput.split('@')[0];
-      const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-      
-      try {
-        const regRes = await fetchApi('/public/auth/register', {
-          method: 'POST',
-          body: JSON.stringify({ 
-            email: formattedEmail, 
-            password: password, 
-            fullName: formattedName, 
-            phone: '0900000000' 
-          }),
-        });
-
-        if (regRes.data && regRes.data.token) {
-          setToken(regRes.data.token);
-          setUser(regRes.data);
-          alert(`Đăng nhập thành công! Xin chào ${regRes.data.fullName}`);
-          doRedirect(regRes.data.role?.toLowerCase());
-          return;
-        }
-      } catch (regErr) {
-        // If auto-register fails, fallback to local only
-        const loggedUser = {
-          fullName: formattedName,
-          email: formattedEmail,
-          role: 'customer',
-          token: 'demo-customer-token-' + Date.now(),
-          id: Math.floor(Math.random() * 10000) + 10000 // Give them a fake ID to isolate addresses
-        };
-        setToken(loggedUser.token);
-        setUser(loggedUser);
-        alert(`Đăng nhập thành công! Xin chào ${loggedUser.fullName}`);
-        doRedirect(loggedUser.role?.toLowerCase());
-      }
-    } finally {
+          if (matched) {
+            setToken(matched.token || 'customer-token-' + Date.now());
+            setUser(matched);
+            alert(`Đăng nhập thành công! Xin chào ${matched.fullName}`);
+            doRedirect(matched.role?.toLowerCase());
+            return;
+          }
+        } catch (localErr) {}
+        
+        setError('Email hoặc mật khẩu không chính xác!');
+      } finally {
       setLoading(false);
     }
   };
